@@ -232,13 +232,7 @@ index.html:
     } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyCO_tL1vDTMJg-AoY793tacgSQpTlRn1us",
-        authDomain: "storageservice-9e801.firebaseapp.com",
-        projectId: "storageservice-9e801",
-        storageBucket: "storageservice-9e801.firebasestorage.app",
-        messagingSenderId: "118069956337",
-        appId: "1:118069956337:web:967fa5f2aff8b395f9a350",
-        measurementId: "G-M26YZ1N3T4"
+        // enter apikey
     };
 
     const app = initializeApp(firebaseConfig);
