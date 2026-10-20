@@ -1,0 +1,835 @@
+Step 1: Create the project
+1. Open VS Code.
+2. Create a folder named BookAPI.
+3. Open the folder in VS Code.
+4. Create these three files:
+BookAPI/
+├── index.html
+├── style.css
+└── script.js
+Step 2: Write the HTML code
+Open index.html and paste:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>📚 Book Management System</h2>
+        <p>Search books using the Open Library API</p>
+
+        <div class="search-box">
+            <input type="text" id="bookName"
+                   placeholder="Enter book name">
+            <button onclick="searchBook()">Search</button>
+        </div>
+        <div id="results"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+Save the file using Ctrl + S.
+Step 3: Write the CSS code
+Step 4: Write the JavaScript code
+Open script.js and paste:
+async function searchBook() {
+    const book = document.getElementById("bookName").value.trim();
+    const results = document.getElementById("results");
+    if (!book) {
+        results.innerHTML = "<p class='error'>Enter a book name.</p>";
+        return;
+    }
+    results.innerHTML = "<p>Searching books...</p>";
+    try {
+        const url =
+            `https://openlibrary.org/search.json?q=${encodeURIComponent(book)}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error("API request failed");
+        }
+        const data = await response.json();
+        displayBooks(data.docs);
+    } catch (error) {
+        results.innerHTML =
+            "<p class='error'>Unable to retrieve books. Check your internet connection.</p>";
+    }
+}
+function displayBooks(books) {
+    const results = document.getElementById("results");
+    results.innerHTML = "";
+    if (!books || books.length === 0) {
+        results.innerHTML = "<p>No books found.</p>";
+        return;
+    }
+    books.slice(0, 10).forEach(book => {
+        const title = book.title || "Unknown title";
+        const authors = book.author_name
+            ? book.author_name.join(", ")
+            : "Unknown author";
+        const year = book.first_publish_year || "Not available";
+        const card = document.createElement("div");
+        card.className = "book";
+        const heading = document.createElement("h3");
+        heading.textContent = title;
+        const author = document.createElement("p");
+        author.textContent = "Author: " + authors;
+        const published = document.createElement("p");
+        published.textContent = "Published: " + year;
+        card.append(heading, author, published);
+        results.appendChild(card);
+    });
+}
+Save the file. This code retrieves the book title, author, and first publication year from the API.
+Step 5: Test the API separately
+Open your browser and visit:  https://openlibrary.org/search.json?q=python&utm_source=chatgpt.com
+Test Open Library API: Python booksYou should see a JSON response containing book information. This confirms that the API is reachable.
+Step 6: Install Live Server
+1. In VS Code, click the Extensions icon on the left.
+2. Search for Live Server.
+3. Install the Live Server extension.
+4. Open index.html.
+5. Right-click inside the file.
+6. Select Open with Live Server.
+Your browser should open the Book Management System page.
+Step 7: Run and test the application
+Enter Python in the search box.
+Click Search.
+Wait for the API response.
+Check that book titles, authors, and publication years appear.
+Search for another book, such as Harry Potter, to test it again.
+2.postman
+run:
+node -v
+npm -v
+mkdir REST
+cd REST
+npm init -y
+npm install express
+npm install nodemon
+app.js:
+const express= require('express');
+const app=express();
+app.use(express.json());
+let books=[
+    {id:1,title:"harry potter"},
+    {id:2,title:"twilight"},
+];
+app.get('/books',(req,res) => {
+    res.send(books);
+});
+app.post('/books',(req,res) => {
+    books.push(req.body);
+    res.send("Books added successfully");
+});
+app.put('/books/:id' , (req,res) => {
+    const book=books.find(b => b.id==req.params.id);
+    if(!book) return res.status(404).send("books not found");
+    book.title=req.body.title;
+    res.send("book updated successfully");
+});
+app.delete('/books/:id', (req,res) =>{
+    const index=books.findIndex(b => b.id==req.params.id);
+    if(index==-1) return res.status(404).send("book not found");
+    books.splice(index,1);
+    res.send("book deleted successfully");
+});
+app.listen(8080, () => {
+    console.log("server running on port 8080");
+});
+get: http://localhost:8080/books
+post: http://localhost:8080/books
+put: http://localhost:8080/books/2
+delete: http://localhost:8080/books/2
+3. firebase
+index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase CRUD Application</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef2f7;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .container {
+            background: white;
+            max-width: 650px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #ccc;
+        }
+
+        h1 { color: #2563eb; }
+
+        input {
+            margin: 10px;
+            padding: 10px;
+            width: 80%;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 9px 14px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            background: #2563eb;
+        }
+
+        .delete { background: #dc2626; }
+        .edit { background: #059669; }
+
+        .record {
+            background: #f1f5f9;
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        #message { color: #166534; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Firebase CRUD Application</h1>
+    <p>Cloud Firestore Record Manager</p>
+
+    <input type="text" id="name" placeholder="Enter file name">
+    <br>
+    <input type="text" id="description" placeholder="Enter description">
+    <br>
+
+    <button id="saveBtn">Add Record</button>
+    <button id="viewBtn">View Records</button>
+
+    <p id="message"></p>
+    <div id="records"></div>
+</div>
+
+<script type="module">
+    import { initializeApp }
+        from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+
+    import {
+        getFirestore, collection, addDoc, getDocs,
+        doc, updateDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCO_tL1vDTMJg-AoY793tacgSQpTlRn1us",
+        authDomain: "storageservice-9e801.firebaseapp.com",
+        projectId: "storageservice-9e801",
+        storageBucket: "storageservice-9e801.firebasestorage.app",
+        messagingSenderId: "118069956337",
+        appId: "1:118069956337:web:967fa5f2aff8b395f9a350",
+        measurementId: "G-M26YZ1N3T4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const filesRef = collection(db, "files");
+
+    const nameInput = document.getElementById("name");
+    const descInput = document.getElementById("description");
+    const message = document.getElementById("message");
+    const records = document.getElementById("records");
+    const saveBtn = document.getElementById("saveBtn");
+
+    let editId = null;
+
+    // CREATE and UPDATE
+    saveBtn.addEventListener("click", async () => {
+        const name = nameInput.value.trim();
+        const description = descInput.value.trim();
+
+        if (!name || !description) {
+            message.textContent = "Enter both fields!";
+            return;
+        }
+
+        try {
+            if (editId) {
+                await updateDoc(doc(db, "files", editId), {
+                    name, description
+                });
+                message.textContent = "Record updated successfully!";
+                editId = null;
+                saveBtn.textContent = "Add Record";
+            } else {
+                await addDoc(filesRef, { name, description });
+                message.textContent = "Record added successfully!";
+            }
+
+            nameInput.value = "";
+            descInput.value = "";
+            await loadFiles();
+        } catch (error) {
+            message.textContent = "Error: " + error.message;
+        }
+    });
+
+    // READ
+    async function loadFiles() {
+        records.replaceChildren();
+
+        try {
+            const snapshot = await getDocs(filesRef);
+
+            if (snapshot.empty) {
+                records.textContent = "No records found.";
+                return;
+            }
+
+            snapshot.forEach(item => {
+                const data = item.data();
+                const card = document.createElement("div");
+                card.className = "record";
+
+                const title = document.createElement("h3");
+                title.textContent = data.name || "";
+
+                const desc = document.createElement("p");
+                desc.textContent = data.description || "";
+
+                const editBtn = document.createElement("button");
+                editBtn.className = "edit";
+                editBtn.textContent = "Edit";
+
+                editBtn.addEventListener("click", () => {
+                    nameInput.value = data.name || "";
+                    descInput.value = data.description || "";
+                    editId = item.id;
+                    saveBtn.textContent = "Update Record";
+                    message.textContent = "Edit the fields and click Update Record.";
+                });
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete";
+                deleteBtn.textContent = "Delete";
+
+                deleteBtn.addEventListener("click", async () => {
+                    if (!confirm("Delete this record?")) return;
+
+                    try {
+                        await deleteDoc(doc(db, "files", item.id));
+                        message.textContent = "Record deleted successfully!";
+                        await loadFiles();
+                    } catch (error) {
+                        message.textContent = "Delete failed: " + error.message;
+                    }
+                });
+
+                card.append(title, desc, editBtn, deleteBtn);
+                records.appendChild(card);
+            });
+        } catch (error) {
+            message.textContent = "Read failed: " + error.message;
+        }
+    }
+
+    document.getElementById("viewBtn")
+        .addEventListener("click", loadFiles);
+
+    loadFiles();
+</script>
+</body>
+</html>
+4. dropbox
+after creating app, open terminal and run
+mkdir dropbox-storage
+cd dropbox-storage
+npm init -y
+npm install express dropbox multer dotenv
+mkdir public
+code .
+.env:
+DROPBOX_ACCESS_TOKEN=paste_your_dropbox_access_token_here
+server.js:
+require("dotenv").config();
+const express = require("express");
+const multer = require("multer");
+const { Dropbox } = require("dropbox");
+const app = express();
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
+const dbx = new Dropbox({
+  accessToken: process.env.DROPBOX_ACCESS_TOKEN,
+  fetch: globalThis.fetch
+});
+app.use(express.static("public"));
+app.use(express.json());
+// List files
+app.get("/files", async (req, res) => {
+  try {
+    const result = await dbx.filesListFolder({ path: "" });
+    res.json(result.result.entries);
+  } catch (err) {
+    res.status(500).json({ error: "Unable to list files" });
+  }
+});
+// Upload a file
+app.post("/upload", upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Select a file" });
+    }
+    await dbx.filesUpload({
+      path: "/" + req.file.originalname,
+      contents: req.file.buffer,
+      mode: { ".tag": "overwrite" }
+    });
+    res.json({ message: "File uploaded successfully!" });
+  } catch (err) {
+    res.status(500).json({ error: "Upload failed" });
+  }
+});
+// Delete a file
+app.delete("/delete", async (req, res) => {
+  try {
+    const { path } = req.body;
+    if (!path || !path.startsWith("/")) {
+      return res.status(400).json({ error: "Invalid file path" });
+    }
+    await dbx.filesDeleteV2({ path });
+    res.json({ message: "File deleted successfully!" });
+  } catch (err) {
+    res.status(500).json({ error: "Delete failed" });
+  }
+});
+app.listen(3000, () => {
+  console.log("Server running at http://localhost:3000");
+});
+index.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropbox Cloud Storage</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Cloud Storage</h1>
+    <p>Store and manage your files using Dropbox.</p>
+
+    <form id="uploadForm">
+      <input type="file" id="fileInput" required>
+      <button type="submit">Upload File</button>
+    </form>
+
+    <p id="message"></p>
+
+    <h2>My Stored Files</h2>
+    <button id="refreshBtn" type="button">Refresh Files</button>
+    <ul id="fileList"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+script.js:
+const form = document.getElementById("uploadForm");
+const fileInput = document.getElementById("fileInput");
+const fileList = document.getElementById("fileList");
+const message = document.getElementById("message");
+
+async function loadFiles() {
+  fileList.replaceChildren();
+
+  try {
+    const response = await fetch("/files");
+    if (!response.ok) throw new Error();
+
+    const files = await response.json();
+
+    files.forEach(file => {
+      if (file[".tag"] !== "file") return;
+
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      name.textContent = `${file.name} (${file.size} bytes)`;
+      li.appendChild(name);
+
+      const remove = document.createElement("button");
+      remove.textContent = "Delete";
+      remove.onclick = async () => {
+        if (!confirm("Delete " + file.name + "?")) return;
+
+        const response = await fetch("/delete", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: file.path_display })
+        });
+
+        const data = await response.json();
+        message.textContent = data.message || data.error;
+        if (response.ok) loadFiles();
+      };
+      li.appendChild(remove);
+
+      fileList.appendChild(li);
+    });
+
+    if (fileList.children.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No files stored yet.";
+      fileList.appendChild(li);
+    }
+  } catch {
+    message.textContent = "Could not load files.";
+  }
+}
+
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const data = new FormData();
+  data.append("file", file);
+
+  message.textContent = "Uploading...";
+
+  try {
+    const response = await fetch("/upload", {
+      method: "POST",
+      body: data
+    });
+
+    const result = await response.json();
+    message.textContent = result.message || result.error;
+
+    if (response.ok) {
+      form.reset();
+      await loadFiles();
+    }
+  } catch {
+    message.textContent = "Upload failed. Check the server.";
+  }
+});
+
+document.getElementById("refreshBtn")
+  .addEventListener("click", loadFiles);
+
+loadFiles();
+Run: node server.js
+5.mongodb:
+run: 
+node -v
+npm -v
+mkdir StudentCRUD
+cd StudentCRUD
+npm init -y
+npm install express mongoose dotenv
+mkdir public
+code .
+in .env: MONGO_URI
+create server.js and add
+const express = require("express");
+const mongoose = require("mongoose");
+require("dotenv").config();
+const app = express();
+app.use(express.json());
+app.use(express.static("public"));
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB Connected"))
+    .catch(err => console.log(err));
+const Student = mongoose.model("Student", {
+    name: String,
+    department: String,
+    year: Number
+});
+app.post("/students", async (req, res) => {
+    const student = await Student.create(req.body);
+    res.json(student);
+});
+app.get("/students", async (req, res) => {
+    const students = await Student.find();
+    res.json(students);
+});
+app.put("/students/:id", async (req, res) => {
+    const student = await Student.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true, runValidators: true }
+    );
+    res.json(student);
+});
+app.delete("/students/:id", async (req, res) => {
+    await Student.findByIdAndDelete(req.params.id);
+    res.json({ message: "Student deleted" });
+});
+app.listen(3000, () => {
+    console.log("Server running at http://localhost:3000");
+});
+create index.html in public and add
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student CRUD Application</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            background: #f2f2f2;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+        }
+        input { width: 95%; }
+        button { cursor: pointer; }
+        li {
+            margin: 12px 0;
+            padding: 10px;
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Student Management System</h2>
+    <form id="studentForm">
+        <input id="name" placeholder="Student Name" required>
+        <input id="department" placeholder="Department" required>
+        <input id="year" type="number" placeholder="Year" required>
+        <button type="submit">Save Student</button>
+        <button type="button" onclick="resetForm()">Clear</button>
+    </form>
+    <h3>Student Records</h3>
+    <ul id="studentList"></ul>
+</div>
+<script>
+let editId = null;
+async function loadStudents() {
+    const res = await fetch("/students");
+    const students = await res.json();
+    const list = document.getElementById("studentList");
+    list.innerHTML = "";
+    students.forEach(s => {
+        const li = document.createElement("li");
+        const details = document.createElement("span");
+        details.textContent =
+            `${s.name} - ${s.department} - Year ${s.year} `;
+        const edit = document.createElement("button");
+        edit.textContent = "Edit";
+        edit.onclick = () => {
+            editId = s._id;
+            document.getElementById("name").value = s.name;
+            document.getElementById("department").value = s.department;
+            document.getElementById("year").value = s.year;
+        };
+        const del = document.createElement("button");
+        del.textContent = "Delete";
+        del.onclick = async () => {
+            await fetch("/students/" + s._id, {
+                method: "DELETE"
+            });
+            loadStudents();
+        };
+        li.append(details, edit, del);
+        list.appendChild(li);
+    });
+}
+document.getElementById("studentForm").onsubmit = async e => {
+    e.preventDefault();
+    const student = {
+        name: document.getElementById("name").value,
+        department: document.getElementById("department").value,
+        year: Number(document.getElementById("year").value)
+    };
+    const url = editId
+        ? "/students/" + editId
+        : "/students";
+    await fetch(url, {
+        method: editId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(student)
+    });
+    resetForm();
+    loadStudents();
+};
+function resetForm() {
+    editId = null;
+    document.getElementById("studentForm").reset();
+}
+loadStudents();
+</script>
+</body>
+</html>
+Run: node server.js
+6. Oauth:
+Allowed Callback URLs:	http://localhost:3000/callback
+Allowed Logout URLs:	http://localhost:3000
+open: https://github.com/auth0-samples/auth0-servlet-sample?utm_source=chatgpt.com
+download the zip and extract. open 01-login folder in terminal
+check:
+java -version
+javac -version
+gradle -version
+in build.gradle:
+replace the distribution url with:distributionUrl=https\://services.gradle.org/distributions/gradle-8.5-bin.zip
+Run:gradlew.bat --stop
+open web.xml: replace domain,client ID, client secret.
+Run:gradlew.bat clean appRun
+Open: http://localhost:3000/login
+8. hadoop
+sudo apt update
+sudo apt install openjdk-11-jdk ssh rsync -y
+sudo service ssh start
+cd ~
+wget https://archive.apache.org/dist/hadoop/common/hadoop-3.3.6/hadoop-3.3.6.tar.gz
+tar -xzf hadoop-3.3.6.tar.gz
+nano ~/.bashrc
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export HADOOP_HOME=$HOME/hadoop-3.3.6
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+source ~/.bashrc
+hadoop version
+readlink -f $(which java)
+nano $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+
+nano $HADOOP_HOME/etc/hadoop/core-site.xml
+
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://localhost:9000</value>
+</property>
+
+nano $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+
+<property>
+<name>dfs.replication</name>
+<value>1</value>
+</property>
+
+nano $HADOOP_HOME/etc/hadoop/mapred-site.xml
+
+<property>
+<name>mapreduce.framework.name</name>
+<value>yarn</value>
+</property>
+
+nano $HADOOP_HOME/etc/hadoop/yarn-site.xml
+
+<property>
+<name>yarn.nodemanager.aux-services</name>
+<value>mapreduce_shuffle</value>
+</property>
+
+ssh-keygen -t rsa -P ""
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+ssh localhost
+exit
+hdfs namenode -format
+
+start-dfs.sh
+start-yarn.sh
+jps
+
+echo "hello hadoop hello mapreduce" > input.txt
+
+hdfs dfs -mkdir -p /input
+hdfs dfs -put input.txt /input/
+ls $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar
+hadoop jar $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.6.jar wordcount /input /output
+hdfs dfs -cat /output/part-r-00000
+stop-yarn.sh
+stop-dfs.sh
+
+9. spark:
+sudo apt update
+sudo apt install default-jdk -y
+sudo apt install scala -y
+sudo apt install wget -y
+ls -lh spark-3.5.7-bin-hadoop3.tgz
+find ~ -name "spark-3.5.7-bin-hadoop3.tgz" 2>/dev/null
+ls /usr/local/spark
+spark-shell --version
+wget https://archive.apache.org/dist/spark/spark-3.5.7/spark-3.5.7-bin-hadoop3.tgz
+tar -xzf spark-3.5.7-bin-hadoop3.tgz
+sudo mv spark-3.5.7-bin-hadoop3 /usr/local/spark
+echo 'export SPARK_HOME=/usr/local/spark' >> ~/.bashrc
+echo 'export PATH=$PATH:$SPARK_HOME/bin' >> ~/.bashrc
+source ~/.bashrc
+spark-shell
+:quit
+echo "apple mango apple mango apple" > input.txt
+spark-shell
+val input = sc.textFile("input.txt")
+val words = input.flatMap(line => line.split(" "))
+val pairs = words.map(word => (word, 1))
+val counts = pairs.reduceByKey(_ + _)
+counts.collect().foreach(println)
+counts.saveAsTextFile("output")
+cat output/part-*
+10.Parallel programming:
+sudo apt update
+sudo apt install mpich python3-mpi4py
+nano mpi.py
+from mpi4py import MPI
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+print("Hello from process", rank, "of", size)
+mpirun --oversubscribe -np 4 python3 mpi.py
+sudo apt update
+sudo apt install gcc
+nano omp.c
+#include <stdio.h>
+#include <omp.h>
+int main() {
+    #pragma omp parallel
+    {
+        printf("Hello from thread %d\n",
+               omp_get_thread_num());
+    }
+    return 0;
+}
+gcc -fopenmp omp.c -o omp
+export OMP_NUM_THREADS=4
+./omp
+nano sum.c
+#include <stdio.h>
+#include <omp.h>
+int main() {
+    int sum = 0;
+    #pragma omp parallel for reduction(+:sum)
+    for (int i = 1; i <= 10; i++) {
+        sum += i;
+    }
+    printf("Sum = %d\n", sum);
+    return 0;
+}
+gcc -fopenmp sum.c -o sum
+./sum
